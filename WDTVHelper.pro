@@ -15,10 +15,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     mirrorsxmlhandler.cpp \
-    netxmlhandler.cpp
+    netxmlhandler.cpp \
+    mirror.cpp
 
 HEADERS  += mainwindow.h \
     mirrorsxmlhandler.h \
-    netxmlhandler.h
+    netxmlhandler.h \
+    mirror.h
 
 FORMS    += mainwindow.ui
