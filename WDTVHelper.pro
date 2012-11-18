@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,8 +13,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    mirrorsxmlhandler.cpp \
+    netxmlhandler.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    mirrorsxmlhandler.h \
+    netxmlhandler.h
 
 FORMS    += mainwindow.ui
