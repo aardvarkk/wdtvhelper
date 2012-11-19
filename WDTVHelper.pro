@@ -15,11 +15,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     mirrorsxmlhandler.cpp \
+    seriesxmlhandler.cpp \
     netxmlhandler.cpp \
     mirror.cpp
 
 HEADERS  += mainwindow.h \
     mirrorsxmlhandler.h \
+    seriesxmlhandler.h \
     netxmlhandler.h \
     mirror.h
 

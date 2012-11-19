@@ -1,19 +1,22 @@
-#ifndef MIRRORSXMLPARSER_H
-#define MIRRORSXMLPARSER_H
+#ifndef SERIESXMLPARSER_H
+#define SERIESXMLPARSER_H
 
 #include <QVector>
 
 #include "netxmlhandler.h"
 #include "mirror.h"
 
-class MirrorsXMLHandler: public NetXMLHandler
+class SeriesXMLHandler: public NetXMLHandler
 {
     Q_OBJECT
 
 public:
-    MirrorsXMLHandler() {}
+    SeriesXMLHandler() {}
     bool startElement(const QString &namespaceURI, const QString &localName, const QString &qName, const QXmlAttributes &atts);
     bool endElement(const QString &namespaceURI, const QString &localName, const QString &qName);
+    bool startEntity(const QString &name);
+    bool startDTD(const QString &name, const QString &publicId, const QString &systemId);
+    bool internalEntityDecl(const QString &name, const QString &value);
     bool characters(const QString &ch);
     bool endDocument();
 
@@ -21,7 +24,7 @@ public:
     QVector<Mirror> getMirrors() { return mirrors; }
 
 signals:
-    void mirrorsReady();
+    void seriesReady();
     
 private:
     QString prev_element;
@@ -29,4 +32,4 @@ private:
     QVector<Mirror> mirrors;
 };
 
-#endif // MIRRORSXMLPARSER_H
+#endif // SERIESXMLPARSER_H
