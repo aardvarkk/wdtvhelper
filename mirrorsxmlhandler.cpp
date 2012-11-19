@@ -59,3 +59,10 @@ bool MirrorsXMLHandler::internalEntityDecl(const QString &name, const QString &v
     return true;
 }
 
+bool MirrorsXMLHandler::endDocument()
+{
+    // We should have found all the mirrors
+    emit MirrorsXMLHandler::mirrorsReady();
+    return true;
+}
+

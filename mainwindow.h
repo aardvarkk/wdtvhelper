@@ -18,6 +18,9 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget* parent = 0);
     ~MainWindow();
+
+public slots:
+    void mirrorsReady();
     
 private:
     Ui::MainWindow* ui;
@@ -27,6 +30,8 @@ private:
 
     // Parsers for different calls
     MirrorsXMLHandler mirrors_handler;
+    QVector<Mirror> mirrors;
+    bool mirrors_ready;
 };
 
 #endif // MAINWINDOW_H
