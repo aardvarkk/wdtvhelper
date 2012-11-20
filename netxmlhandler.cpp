@@ -22,4 +22,7 @@ void NetXMLHandler::XMLReady()
     QXmlSimpleReader reader;
     reader.setContentHandler(this);
     bool success = reader.parse(source);
+
+    // Mention to our children that we're done parsing
+    parsingComplete(success);
 }

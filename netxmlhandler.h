@@ -9,6 +9,9 @@ class NetXMLHandler : public QObject, public QXmlDefaultHandler
 
 public:
     NetXMLHandler();
+
+protected:
+    virtual void parsingComplete(bool success) = 0;
     
 signals:
     

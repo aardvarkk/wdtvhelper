@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Get the mirrors
     QNetworkReply* r = am.get(QNetworkRequest(mirrors_url));
-    connect(r, SIGNAL(readyRead()), &mirrors_handler, SLOT(XMLReady()));
+    connect(r, SIGNAL(finished()), &mirrors_handler, SLOT(XMLReady()));
 }
 
 MainWindow::~MainWindow()
@@ -74,18 +74,16 @@ void MainWindow::mirrorsReady()
 
 void MainWindow::seriesReady()
 {
+    series = series_handler.getSeries();
+    episodes = series_handler.getEpisodes();
 
+    statusBar()->showMessage("Series name is " + series.series_name);
+    for (int i = 0; i < episodes.size(); ++i)
+        statusBar()->showMessage("Season " + QString::number(episodes[i].season_number) + " Episode " + QString::number(episodes[i].episode_number) + " - " + episodes[i].episode_name);
 }
 
 void MainWindow::on_load_clicked()
 {
-    int series = ui->seriesNumberLineEdit->text().toInt();
-    QString series_str = QString::number(series);
-    statusBar()->showMessage("Loading series number " + series_str);
-
-    // We want a signal back saying the mirrors are found
-    connect(&series_handler, SIGNAL(seriesReady()), this, SLOT(seriesReady()));
-
     if (!mirrors_ready || mirrors.count() < 1)
     {
         QErrorMessage err;
@@ -94,8 +92,15 @@ void MainWindow::on_load_clicked()
         return;
     }
 
+    int series = ui->seriesNumberLineEdit->text().toInt();
+    QString series_str = QString::number(series);
+    statusBar()->showMessage("Loading series number " + series_str);
+
+    // We want a signal back saying the mirrors are found
+    connect(&series_handler, SIGNAL(seriesReady()), this, SLOT(seriesReady()));
+
     // Get the series
-    QUrl series_url = mirrors[0].url.toString() + "/api/" + api_key + "/series/" + series_str + "/default/";
+    QUrl series_url = mirrors[0].url.toString() + "/api/" + api_key + "/series/" + series_str + "/all/";
     QNetworkReply* r = am.get(QNetworkRequest(series_url));
-    connect(r, SIGNAL(readyRead()), &series_handler, SLOT(XMLReady()));
+    connect(r, SIGNAL(finished()), &series_handler, SLOT(XMLReady()));
 }

@@ -13,6 +13,8 @@ bool MirrorsXMLHandler::endElement(const QString &namespaceURI, const QString &l
     if (!qName.compare("Mirror"))
         mirrors.push_back(current_mirror);
 
+    prev_element.clear();
+
     return true;
 }
 
@@ -27,16 +29,14 @@ bool MirrorsXMLHandler::characters(const QString &ch)
         current_mirror.mirror_type = static_cast<Mirror::MirrorType>(ch.toInt());
     }
 
-    // Reset
-    prev_element = "";
+    prev_element.clear();
 
     return true;
 }
 
-bool MirrorsXMLHandler::endDocument()
+void MirrorsXMLHandler::parsingComplete(bool success)
 {
     // We should have found all the mirrors
     emit MirrorsXMLHandler::mirrorsReady();
-    return true;
 }
 

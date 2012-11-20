@@ -43,7 +43,12 @@ private:
     // Parsers for different calls
     MirrorsXMLHandler mirrors_handler;
     SeriesXMLHandler series_handler;
+
+    // Our data model
     QVector<Mirror> mirrors;
+    Series series;
+    QVector<Episode> episodes;
+
     bool mirrors_ready;
 };
 
