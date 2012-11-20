@@ -4,12 +4,22 @@
 #include <QDate>
 #include <QLocale>
 #include <QString>
+#include <QDir>
 #include <QStringList>
+
+#include "series.h"
 
 class Episode
 {
 public:
     Episode();
+
+    // Save an episode to a given directory with a given filename
+    void saveToWDTVXML(QDir const& dir, QString filename);
+
+    // Utility functions
+    QString seasonString() { return "S" + QString::number(season_number).rightJustified(2, '0'); }
+    QString episodeString() { return "E" + QString::number(episode_number).rightJustified(2, '0'); }
 
     int id;
     int combined_episode;
@@ -37,6 +47,9 @@ public:
     long long last_updated;
     int season_id;
     int series_id;
+
+    // All of our series info
+    Series series;
 };
 
 #endif // EPISODE_H

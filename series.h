@@ -18,7 +18,7 @@ public:
     QStringList actors;
     Qt::DayOfWeek airs_dayofweek;
     QTime airs_time;
-    ContentRating content_rating;
+    ContentRating::Rating content_rating;
     QDate first_aired;
     QStringList genres;
     QString imdb_id;

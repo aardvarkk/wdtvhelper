@@ -28,7 +28,9 @@ public slots:
 private slots:
     void on_load_clicked();
 
-    void on_pushButton_clicked();
+    void on_browseButton_clicked();
+
+    void on_saveButton_clicked();
 
 private:
     Ui::MainWindow* ui;

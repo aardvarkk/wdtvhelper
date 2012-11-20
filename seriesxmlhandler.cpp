@@ -18,6 +18,8 @@ bool SeriesXMLHandler::endElement(const QString &namespaceURI, const QString &lo
     }
     else if (!qName.compare("Episode"))
     {
+        // Set the series for convenience (when we write the episodes)
+        current_episode.series = series;
         episodes.push_back(current_episode);
     }
 
@@ -62,20 +64,20 @@ void SeriesXMLHandler::HandleSeries(QString const& ch)
     }
     else if (!prev_element.compare("ContentRating"))
     {
-        if (!ch.compare("TV-Y"))
-            current_series.content_rating = TV_Y;
-        else if (!ch.compare("TV-Y7"))
-            current_series.content_rating = TV_Y7;
-        else if (!ch.compare("TV-Y7-FV"))
-            current_series.content_rating = TV_Y7_FV;
-        else if (!ch.compare("TV-G"))
-            current_series.content_rating = TV_G;
-        else if (!ch.compare("TV-PG"))
-            current_series.content_rating = TV_PG;
-        else if (!ch.compare("TV-14"))
-            current_series.content_rating = TV_14;
-        else if (!ch.compare("TV-MA"))
-            current_series.content_rating = TV_MA;
+        if (!ch.compare(ContentRating::toString(ContentRating::TV_Y)))
+            current_series.content_rating = ContentRating::TV_Y;
+        else if (!ch.compare(ContentRating::toString(ContentRating::TV_Y7)))
+            current_series.content_rating = ContentRating::TV_Y7;
+        else if (!ch.compare(ContentRating::toString(ContentRating::TV_Y7_FV)))
+            current_series.content_rating = ContentRating::TV_Y7_FV;
+        else if (!ch.compare(ContentRating::toString(ContentRating::TV_G)))
+            current_series.content_rating = ContentRating::TV_G;
+        else if (!ch.compare(ContentRating::toString(ContentRating::TV_PG)))
+            current_series.content_rating = ContentRating::TV_PG;
+        else if (!ch.compare(ContentRating::toString(ContentRating::TV_14)))
+            current_series.content_rating = ContentRating::TV_14;
+        else if (!ch.compare(ContentRating::toString(ContentRating::TV_MA)))
+            current_series.content_rating = ContentRating::TV_MA;
     }
     else if (!prev_element.compare("FirstAired"))
     {

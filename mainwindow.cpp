@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Load our settings
     QSettings settings(organization, application);
     ui->seriesNumberLineEdit->setText(settings.value(ui->seriesNumberLineEdit->objectName()).toString());
+    ui->savePathLineEdit->setText(settings.value(ui->savePathLineEdit->objectName()).toString());
 
     settings.setValue("size", size());
     settings.setValue("pos", pos());
@@ -46,6 +47,7 @@ MainWindow::~MainWindow()
     // Save our settings
     QSettings settings(organization, application);
     settings.setValue(ui->seriesNumberLineEdit->objectName(), ui->seriesNumberLineEdit->text());
+    settings.setValue(ui->savePathLineEdit->objectName(), ui->savePathLineEdit->text());
 
     delete ui;
 }
@@ -110,7 +112,18 @@ void MainWindow::on_load_clicked()
     connect(r, SIGNAL(finished()), &series_handler, SLOT(XMLReady()));
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_browseButton_clicked()
+{
+    // Show the path browser
+    QFileDialog dlg;
+    dlg.setParent(this);
+    dlg.setOption(QFileDialog::ShowDirsOnly);
+    dlg.setFileMode(QFileDialog::Directory);
+    if (dlg.exec())
+        ui->savePathLineEdit->setText(dlg.selectedFiles().first());
+}
+
+void MainWindow::on_saveButton_clicked()
 {
     // Only allow saving to occur if the series is ready
     if (!series_ready)
@@ -121,11 +134,24 @@ void MainWindow::on_pushButton_clicked()
         return;
     }
 
-    // Show the path browser
-    QFileDialog dlg;
-    dlg.setParent(this);
-    dlg.setOption(QFileDialog::ShowDirsOnly);
-    dlg.setFileMode(QFileDialog::Directory);
-    if (dlg.exec())
-        ui->savePathLineEdit->setText(dlg.selectedFiles().first());
+    // Get the save path
+    QString save_path = ui->savePathLineEdit->text();
+
+    // Does the save path exist?
+    if (save_path.length() <= 0 || !QDir(save_path).exists())
+    {
+        QErrorMessage err;
+        err.showMessage("Save path is empty or does not exist");
+        err.exec();
+    }
+
+    // Go through each of the episodes and write an XML file for it in the save path!
+    for (int i = 0; i < episodes.size(); ++i)
+    {
+        QString filename = series.series_name + " " + episodes[i].seasonString() + episodes[i].episodeString() + ".xml";
+        episodes[i].saveToWDTVXML(QDir(save_path), filename);
+        ui->statusBar->showMessage("Saved " + filename + " (" + QString::number(i+1) + " of " + QString::number(episodes.size()) + ")");
+    }
+
+    ui->statusBar->showMessage("Done");
 }

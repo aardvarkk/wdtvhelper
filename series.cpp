@@ -4,7 +4,7 @@ Series::Series()
 {
     id = 0;
     airs_dayofweek = Qt::Monday;
-    content_rating = TV_MA;
+    content_rating = ContentRating::TV_MA;
     language = QLocale::English;
     network_id = 0;
     rating = 0;
