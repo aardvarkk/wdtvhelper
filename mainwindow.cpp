@@ -1,5 +1,6 @@
 #include <QtXml>
 #include <QErrorMessage>
+#include <QFileDialog>
 #include <QSettings>
 
 #include "mainwindow.h"
@@ -9,8 +10,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    // Our app!
     organization = "Tau Labs";
     application = "WDTVHelper";
+
+    // Our setup booleans
+    mirrors_ready = false;
+    series_ready = false;
 
     // Create the UI
     ui->setupUi(this);
@@ -26,9 +32,6 @@ MainWindow::MainWindow(QWidget *parent) :
     api_key = "AB01ECDE21FAB325";
     root_url = "http://www.thetvdb.com";
     mirrors_url = root_url.toString() + "/" + api_key + "/mirrors.xml";
-
-    // If we're done getting the mirrors
-    mirrors_ready = false;
 
     // We want a signal back saying the mirrors are found
     connect(&mirrors_handler, SIGNAL(mirrorsReady()), this, SLOT(mirrorsReady()));
@@ -49,8 +52,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::mirrorsReady()
 {
-    mirrors_ready = true;
-
     // Store the mirrors
     mirrors = mirrors_handler.getMirrors();
 
@@ -70,6 +71,8 @@ void MainWindow::mirrorsReady()
         msg << "Found mirror at" << mirrors[i].url.toString() << "to provide" << source_for.join(", ");
         statusBar()->showMessage(msg.join(" "));
     }
+
+    mirrors_ready = true;
 }
 
 void MainWindow::seriesReady()
@@ -77,9 +80,11 @@ void MainWindow::seriesReady()
     series = series_handler.getSeries();
     episodes = series_handler.getEpisodes();
 
-    statusBar()->showMessage("Series name is " + series.series_name);
-    for (int i = 0; i < episodes.size(); ++i)
-        statusBar()->showMessage("Season " + QString::number(episodes[i].season_number) + " Episode " + QString::number(episodes[i].episode_number) + " - " + episodes[i].episode_name);
+    statusBar()->showMessage(series.series_name + " has " + QString::number(episodes.size()) + " episodes");
+//    for (int i = 0; i < episodes.size(); ++i)
+//        statusBar()->showMessage("Season " + QString::number(episodes[i].season_number) + " Episode " + QString::number(episodes[i].episode_number) + " - " + episodes[i].episode_name);
+
+    series_ready = true;
 }
 
 void MainWindow::on_load_clicked()
@@ -87,7 +92,7 @@ void MainWindow::on_load_clicked()
     if (!mirrors_ready || mirrors.count() < 1)
     {
         QErrorMessage err;
-        err.showMessage("Mirrors are not yet ready");
+        err.showMessage("Mirrors have not been loaded yet");
         err.exec();
         return;
     }
@@ -103,4 +108,24 @@ void MainWindow::on_load_clicked()
     QUrl series_url = mirrors[0].url.toString() + "/api/" + api_key + "/series/" + series_str + "/all/";
     QNetworkReply* r = am.get(QNetworkRequest(series_url));
     connect(r, SIGNAL(finished()), &series_handler, SLOT(XMLReady()));
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    // Only allow saving to occur if the series is ready
+    if (!series_ready)
+    {
+        QErrorMessage err;
+        err.showMessage("Series has not been loaded yet");
+        err.exec();
+        return;
+    }
+
+    // Show the path browser
+    QFileDialog dlg;
+    dlg.setParent(this);
+    dlg.setOption(QFileDialog::ShowDirsOnly);
+    dlg.setFileMode(QFileDialog::Directory);
+    if (dlg.exec())
+        ui->savePathLineEdit->setText(dlg.selectedFiles().first());
 }

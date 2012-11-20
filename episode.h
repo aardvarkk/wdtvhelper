@@ -16,7 +16,7 @@ public:
     int combined_season;
     int dvd_chapter;
     int dvd_disc_id;
-    int dvd_episode;
+    QString dvd_episode; // This can be of the form "4.1" if episodes are combined
     int dvd_season;
     QStringList directors;
     int ep_img_flag;

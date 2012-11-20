@@ -7,7 +7,6 @@ Episode::Episode()
     combined_season = 0;
     dvd_chapter = 0;
     dvd_disc_id = 0;
-    dvd_episode = 0;
     dvd_season = 0;
     ep_img_flag = 0;
     episode_number = 0;

@@ -28,6 +28,8 @@ public slots:
 private slots:
     void on_load_clicked();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow* ui;
 
@@ -44,12 +46,14 @@ private:
     MirrorsXMLHandler mirrors_handler;
     SeriesXMLHandler series_handler;
 
+    // Let's us know when it's OK to start
+    bool mirrors_ready;
+    bool series_ready;
+
     // Our data model
     QVector<Mirror> mirrors;
     Series series;
     QVector<Episode> episodes;
-
-    bool mirrors_ready;
 };
 
 #endif // MAINWINDOW_H
