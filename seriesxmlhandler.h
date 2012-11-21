@@ -20,6 +20,8 @@ public:
     bool error(const QXmlParseException &exception);
     bool fatalError(const QXmlParseException &exception);
 
+    void clear();
+
     // accesors
     Series getSeries() { return series; }
     QVector<Episode> getEpisodes() { return episodes; }

@@ -3,6 +3,16 @@
 
 #include "seriesxmlhandler.h"
 
+void SeriesXMLHandler::clear()
+{
+    prev_element.clear();
+    handling_series = true;
+    current_series = Series();
+    current_episode = Episode();
+    series = Series();
+    episodes.clear();
+}
+
 bool SeriesXMLHandler::startElement(QString const& namespaceURI,  QString const& localName, QString const& qName, QXmlAttributes const& atts)
 {
     prev_element = qName;
@@ -30,16 +40,14 @@ bool SeriesXMLHandler::endElement(const QString &namespaceURI, const QString &lo
 
 void SeriesXMLHandler::HandleSeries(QString const& ch)
 {
+    // When splitting, don't keep empty parts
     if (!prev_element.compare("id"))
     {
         current_series.id = ch.toInt();
     }
     else if (!prev_element.compare("Actors"))
     {
-        if (ch.length() > 1 && ch[0] == '|')
-            current_series.actors = ch.mid(1, ch.length()-2).split("|");
-        else
-            current_series.actors = ch.split("|");
+        current_series.actors = ch.split("|", QString::SkipEmptyParts);
     }
     else if (!prev_element.compare("Airs_DayOfWeek"))
     {
@@ -85,10 +93,7 @@ void SeriesXMLHandler::HandleSeries(QString const& ch)
     }
     else if (!prev_element.compare("Genre"))
     {
-        if (ch.length() > 1 && ch[0] == '|')
-            current_series.genres = ch.mid(1, ch.length()-2).split("|");
-        else
-            current_series.genres = ch.split("|");
+        current_series.genres = ch.split("|", QString::SkipEmptyParts);
     }
     else if (!prev_element.compare("IMDB_ID"))
     {
@@ -207,10 +212,7 @@ void SeriesXMLHandler::HandleEpisode(QString const& ch)
     }
     else if (!prev_element.compare("Director"))
     {
-        if (ch.length() > 1 && ch[0] == '|')
-            current_episode.directors = ch.mid(1, ch.length()-2).split("|");
-        else
-            current_episode.directors = ch.split("|");
+        current_episode.directors = ch.split("|", QString::SkipEmptyParts);
     }
     else if (!prev_element.compare("EpImgFlag"))
     {
@@ -230,10 +232,7 @@ void SeriesXMLHandler::HandleEpisode(QString const& ch)
     }
     else if (!prev_element.compare("GuestStars"))
     {
-        if (ch.length() > 1 && ch[0] == '|')
-            current_episode.guest_stars = ch.mid(1, ch.length()-2).split("|");
-        else
-            current_episode.guest_stars = ch.split("|");
+        current_episode.guest_stars = ch.split("|", QString::SkipEmptyParts);
     }
     else if (!prev_element.compare("IMDB_ID"))
     {
@@ -269,10 +268,7 @@ void SeriesXMLHandler::HandleEpisode(QString const& ch)
     }
     else if (!prev_element.compare("Writer"))
     {
-        if (ch.length() > 1 && ch[0] == '|')
-            current_episode.writers = ch.mid(1, ch.length()-2).split("|");
-        else
-            current_episode.writers = ch.split("|");
+        current_episode.writers = ch.split("|", QString::SkipEmptyParts);
     }
     else if (!prev_element.compare("absolute_number"))
     {

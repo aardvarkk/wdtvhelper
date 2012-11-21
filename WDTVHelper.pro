@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     netxmlhandler.cpp \
     mirror.cpp \
     series.cpp \
-    episode.cpp
+    episode.cpp \
+    downloader.cpp
 
 HEADERS  += mainwindow.h \
     mirrorsxmlhandler.h \
@@ -29,6 +30,7 @@ HEADERS  += mainwindow.h \
     series.h \
     episode.h \
     contentrating.h \
-    seriesstatus.h
+    seriesstatus.h \
+    downloader.h
 
 FORMS    += mainwindow.ui

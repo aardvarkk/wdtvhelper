@@ -6,6 +6,7 @@
 #include <QString>
 #include <QDir>
 #include <QStringList>
+#include <QImage>
 
 #include "series.h"
 
@@ -15,7 +16,15 @@ public:
     Episode();
 
     // Save an episode to a given directory with a given filename
-    void saveToWDTVXML(QDir const& dir, QString filename);
+    void saveToWDTVXML(QDir const& dir, QString pattern);
+
+    // Save the metathumb for an episode
+    void saveMetaThumb(QUrl mirror, QDir const& dir, QString pattern);
+
+    // Resize to desired aspect ratio
+    static const int kAspectW = 680;
+    static const int kAspectH = 1000;
+    void resizeMetaThumb();
 
     // Utility functions
     QString seasonString() { return "S" + QString::number(season_number).rightJustified(2, '0'); }
@@ -50,6 +59,9 @@ public:
 
     // All of our series info
     Series series;
+
+    // Our metathumb
+    QImage metathumb;
 };
 
 #endif // EPISODE_H

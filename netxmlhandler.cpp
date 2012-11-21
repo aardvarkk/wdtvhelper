@@ -14,6 +14,9 @@ void NetXMLHandler::XMLReady()
     // Lets print the HTTP GET response.
     QByteArray ba = reply->readAll();
 
+    // Done with the reply
+    delete reply;
+
     // Create XML from it
     QBuffer buffer(&ba);
 

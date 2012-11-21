@@ -1,5 +1,9 @@
+#include <QDebug>
+#include <QEventLoop>
 #include <QXmlStreamWriter>
+#include <QImageWriter>
 
+#include "downloader.h"
 #include "episode.h"
 
 Episode::Episode()
@@ -21,13 +25,13 @@ Episode::Episode()
     series_id = 0;
 }
 
-void Episode::saveToWDTVXML(QDir const& dir, QString filename)
+void Episode::saveToWDTVXML(QDir const& dir, QString pattern)
 {
     // Make sure the directory exists
     if (!dir.exists()) return;
 
     // Create a file inside that directory
-    QFile file(dir.absolutePath() + '/' + filename);
+    QFile file(dir.absolutePath() + '/' + pattern + ".xml");
 
     // TODO: If it exists, just overwrite it for now...
 
@@ -37,12 +41,14 @@ void Episode::saveToWDTVXML(QDir const& dir, QString filename)
 
     // Open the XML stream
     QXmlStreamWriter stream(&file);
-    stream.setAutoFormatting(true);
+    //stream.setAutoFormatting(true);
     stream.writeStartDocument();
     stream.writeStartElement("details");
 
     stream.writeStartElement("id");
-    stream.writeCharacters(QString::number(id));
+    // WDTV uses the series id, not the episode id...
+//    stream.writeCharacters(QString::number(id));
+    stream.writeCharacters(QString::number(series.id));
     stream.writeEndElement();
 
     stream.writeStartElement("title");
@@ -106,7 +112,7 @@ void Episode::saveToWDTVXML(QDir const& dir, QString filename)
 
     for (int i = 0; i < guest_stars.size(); ++i)
     {
-        if (i > 0) stream.writeCharacters("/");
+        if (i > 0 || series.actors.size() > 0) stream.writeCharacters("/");
         stream.writeCharacters(guest_stars[i]);
     }
     stream.writeEndElement();
@@ -123,4 +129,42 @@ void Episode::saveToWDTVXML(QDir const& dir, QString filename)
 
     // We're done
     file.close();
+}
+
+void Episode::resizeMetaThumb()
+{
+    // Two options: wider than tall (expected)
+    if (metathumb.width() > metathumb.height())
+    {
+        int w = metathumb.height() * kAspectW / kAspectH;
+        int diff = metathumb.width() - w;
+        metathumb = metathumb.copy(diff/2, 0, w, metathumb.height());
+    }
+    // Taller than wide (nice!)
+    else
+    {
+        int h = metathumb.width() * kAspectH / kAspectW;
+        int diff = metathumb.height() - h;
+        metathumb = metathumb.copy(0, diff/2, metathumb.width(), h);
+    }
+}
+
+void Episode::saveMetaThumb(QUrl mirror, const QDir &dir, QString pattern)
+{
+    if (filename.length() <= 0)
+        return;
+
+    // Generate the URL
+    Downloader downloader;
+    downloader.downloadImage(mirror.url() + "/banners/" + filename, metathumb);
+
+    // We have our metathumb
+    // Do some work to resize it to poster aspect
+    resizeMetaThumb();
+
+    // Write it out!
+    QImageWriter writer;
+    writer.setFileName(dir.absolutePath() + '/' + pattern + ".metathumb");
+    writer.setFormat("jpg");
+    writer.write(metathumb);
 }

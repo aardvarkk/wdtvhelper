@@ -37,6 +37,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // We want a signal back saying the mirrors are found
     connect(&mirrors_handler, SIGNAL(mirrorsReady()), this, SLOT(mirrorsReady()));
 
+    // We want a signal back saying the series is ready
+    connect(&series_handler, SIGNAL(seriesReady()), this, SLOT(seriesReady()));
+
     // Get the mirrors
     QNetworkReply* r = am.get(QNetworkRequest(mirrors_url));
     connect(r, SIGNAL(finished()), &mirrors_handler, SLOT(XMLReady()));
@@ -99,15 +102,16 @@ void MainWindow::on_load_clicked()
         return;
     }
 
+    // Reset data
+    series_handler.clear();
+
+    // Start loading
     int series = ui->seriesNumberLineEdit->text().toInt();
     QString series_str = QString::number(series);
     statusBar()->showMessage("Loading series number " + series_str);
 
-    // We want a signal back saying the mirrors are found
-    connect(&series_handler, SIGNAL(seriesReady()), this, SLOT(seriesReady()));
-
     // Get the series
-    QUrl series_url = mirrors[0].url.toString() + "/api/" + api_key + "/series/" + series_str + "/all/";
+    QUrl series_url = mirrors.first().url.toString() + "/api/" + api_key + "/series/" + series_str + "/all/";
     QNetworkReply* r = am.get(QNetworkRequest(series_url));
     connect(r, SIGNAL(finished()), &series_handler, SLOT(XMLReady()));
 }
@@ -148,9 +152,17 @@ void MainWindow::on_saveButton_clicked()
     // Go through each of the episodes and write an XML file for it in the save path!
     for (int i = 0; i < episodes.size(); ++i)
     {
-        QString filename = series.series_name + " " + episodes[i].seasonString() + episodes[i].episodeString() + ".xml";
-        episodes[i].saveToWDTVXML(QDir(save_path), filename);
-        ui->statusBar->showMessage("Saved " + filename + " (" + QString::number(i+1) + " of " + QString::number(episodes.size()) + ")");
+        // Generate a pattern for the file
+        QString pattern = series.series_name + " " + episodes[i].seasonString() + episodes[i].episodeString();
+
+        // Saving the XML files
+        episodes[i].saveToWDTVXML(QDir(save_path), pattern);
+
+        // Saving the .metathumb image
+        episodes[i].saveMetaThumb(mirrors.first().url, QDir(save_path), pattern);
+
+        // Update the status
+        ui->statusBar->showMessage("Saved " + pattern + " (" + QString::number(i+1) + " of " + QString::number(episodes.size()) + ")");
     }
 
     ui->statusBar->showMessage("Done");
